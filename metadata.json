@@ -1,0 +1,6 @@
+{
+  "name": "Aura & Essence",
+  "description": "A luxury medical spa landing page and client portal with clinical precision and customized wellness plans.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
