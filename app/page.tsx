@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Award, 
   Shield, 
@@ -135,6 +135,25 @@ const MEMBERSHIPS = [
   }
 ];
 
+// Before & After Gallery Images mapped by Category
+// All categories use the real uploaded before/after photos
+const BEFORE_SRC = '/ba-before.jpg';
+const AFTER_SRC  = '/ba-after.jpg';
+
+const RESULT_GALLERY: Record<string, {
+  beforeSrc: string;
+  afterSrc: string;
+  label: string;
+}> = {
+  All:     { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'IPL Skin Rejuvenation (Full Face)' },
+  Skin:    { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'Laser Resurfacing & Pigment Correction' },
+  Lips:    { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'Lip Filler & Hydration Treatment' },
+  Jawline: { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'Jawline Definition & Contouring' },
+  Acne:    { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'Acne Therapy & Skin Clarifying' },
+  Laser:   { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'Laser Skin Tightening & Glow' },
+  Body:    { beforeSrc: BEFORE_SRC, afterSrc: AFTER_SRC, label: 'Body Contouring & Skin Firming' },
+};
+
 export default function Home() {
   // Mobile Navigation state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -154,21 +173,26 @@ export default function Home() {
   const [selectedPlan, setSelectedPlan] = useState<typeof MEMBERSHIPS[0] | null>(null);
 
   // Local state for Client Reservations Dashboard
-  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('aura_essence_appointments');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          setAppointments(JSON.parse(saved));
         } catch (e) {
           console.error('Error loading appointments', e);
         }
       }
     }
-    return [];
-  });
+  }, []);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activeResultFilter, setActiveResultFilter] = useState('All');
+  const currentResult = RESULT_GALLERY[activeResultFilter] || RESULT_GALLERY.All;
 
   // Visual Form and Scheduler States
   const [formName, setFormName] = useState('');
@@ -337,7 +361,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* Floating Appointment Console Shortcut */}
-      {appointments.length > 0 && (
+      {mounted && appointments.length > 0 && (
         <button 
           onClick={() => setIsDashboardOpen(true)}
           className="fixed bottom-6 right-6 z-40 bg-[#6c5842] text-white rounded-full p-4 shadow-2xl border border-white/10 hover:bg-[#867159] transition-all flex items-center gap-2 group hover:scale-105 active:scale-95"
@@ -519,8 +543,8 @@ export default function Home() {
       </AnimatePresence>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden bg-[#efeae2]" id="hero-section">
-        <div className="max-w-7xl mx-auto px-6 md:px-16 grid md:grid-cols-12 gap-12 md:gap-16 items-center relative z-10">
+      <section className="relative pt-28 pb-16 md:pt-40 md:pb-24 overflow-hidden bg-[#efeae2]" id="hero-section">
+        <div className="max-w-7xl mx-auto px-5 md:px-16 grid md:grid-cols-12 gap-8 md:gap-16 items-center relative z-10">
           
           {/* Hero text */}
           <motion.div 
@@ -529,7 +553,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="md:col-span-6 flex flex-col items-start text-left"
           >
-            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[4.75rem] text-[#35251a] mb-6 leading-[1.05] font-light">
+            <h1 className="font-display text-[2.6rem] sm:text-5xl md:text-6xl lg:text-[4.75rem] text-[#35251a] mb-5 leading-[1.05] font-light">
               Reveal Your <br/>
               Natural <br/>
               <span className="italic font-normal">Confidence</span>
@@ -541,20 +565,20 @@ export default function Home() {
               <span className="text-[#bda17a] text-xs">✦</span>
             </div>
 
-            <p className="font-sans text-sm md:text-base text-[#5c4e43] mb-10 max-w-md leading-relaxed tracking-wide">
+            <p className="font-sans text-sm md:text-base text-[#5c4e43] mb-8 max-w-md leading-relaxed tracking-wide">
               Expertly tailored treatments that harmonize clinical precision with artistic vision—helping you look and feel authentically, beautifully you.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-16">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mb-10">
               <a 
                 href="#contact" 
-                className="px-8 py-4 bg-[#35251a] text-[#fff8f4] rounded-full font-sans text-xs tracking-widest uppercase font-semibold hover:bg-[#4d3a2d] transition-all text-center shadow-md hover:shadow-lg active:scale-95"
+                className="px-7 py-3.5 bg-[#35251a] text-[#fff8f4] rounded-full font-sans text-xs tracking-widest uppercase font-semibold hover:bg-[#4d3a2d] transition-all text-center shadow-md hover:shadow-lg active:scale-95"
               >
                 Book Consultation
               </a>
               <a 
                 href="#treatments" 
-                className="px-8 py-4 border border-[#35251a]/30 text-[#35251a] rounded-full font-sans text-xs tracking-widest uppercase font-semibold hover:bg-[#35251a]/5 transition-all text-center"
+                className="px-7 py-3.5 border border-[#35251a]/30 text-[#35251a] rounded-full font-sans text-xs tracking-widest uppercase font-semibold hover:bg-[#35251a]/5 transition-all text-center"
               >
                 View Treatments
               </a>
@@ -574,7 +598,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-start gap-2 border-l border-[#35251a]/10 pl-5">
                 <Heart className="w-5 h-5 text-[#bda17a]" />
-                <span className="font-sans text-[10px] tracking-widest text-[#35251a] font-bold uppercase leading-none">Premium Care</span>
+                <span className="font-sans text-[10px] tracking-widest text-[#35251a] font-bold uppercase leading-none">Premium Products</span>
                 <span className="font-sans text-[11px] text-[#5c4e43]/85 leading-tight">Top-tier quality</span>
               </div>
               <div className="flex flex-col items-start gap-2 border-l border-[#35251a]/10 pl-5">
@@ -590,34 +614,17 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="md:col-span-6 relative mt-8 md:mt-0 max-w-md mx-auto md:max-w-none w-full flex items-center justify-center"
+            className="md:col-span-6 relative mt-4 md:mt-0 max-w-[340px] sm:max-w-md mx-auto md:max-w-none w-full flex items-center justify-center"
           >
-            {/* The elegant Arched spa portrait frame */}
-            <div className="relative w-full aspect-[4/5] md:aspect-[3.8/5] max-w-[460px] overflow-hidden rounded-t-[12rem] rounded-b-2xl shadow-2xl border border-[#d1c4ba]/20 bg-[#efeae2]">
-              {/* Luxury spa backdrop inside the frame */}
-              <div className="absolute inset-0 z-0 opacity-25">
-                <Image 
-                  alt="Luxury medical aesthetics interior" 
-                  className="object-cover" 
-                  src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
-                  fill
-                  sizes="460px"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-
-              {/* Radiant circle for subtle glow effect */}
-              <div className="absolute top-[20%] left-[20%] w-[60%] h-[50%] bg-[#bda17a]/20 rounded-full blur-3xl z-10 pointer-events-none" />
-
-              {/* 4K portrait image */}
+            {/* Clean portrait frame */}
+            <div className="relative w-full aspect-[4/5] md:aspect-[4/5] max-w-[480px] overflow-hidden rounded-2xl shadow-xl bg-[#e8e0d8]">
               <Image 
                 alt="Radiant face aesthetic woman" 
-                className="object-cover relative z-20" 
-                src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=3840&q=95"
+                className="object-cover object-top" 
+                src="/hero-woman.jpg"
                 fill
                 priority
-                sizes="(max-width: 768px) 100vw, 460px"
-                referrerPolicy="no-referrer"
+                sizes="(max-width: 768px) 100vw, 480px"
               />
             </div>
 
@@ -626,7 +633,7 @@ export default function Home() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 }}
-              className="absolute right-0 top-[35%] md:-right-6 bg-[#fffbf8]/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-[#35251a]/10 max-w-[200px] flex flex-col gap-2 z-30"
+              className="hidden sm:flex absolute right-0 top-[30%] md:-right-6 bg-[#fffbf8]/90 backdrop-blur-md p-3.5 md:p-5 rounded-2xl shadow-xl border border-[#35251a]/10 max-w-[160px] md:max-w-[200px] flex-col gap-2 z-30"
             >
               <div className="flex gap-3 items-start">
                 <div className="bg-[#bda17a]/15 w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border border-[#bda17a]/20">
@@ -648,7 +655,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="absolute right-0 bottom-6 md:-right-8 bg-[#fffbf8] p-4 rounded-2xl shadow-lg border border-[#35251a]/5 flex items-center gap-4 z-30"
+              className="hidden sm:flex absolute right-0 bottom-4 md:-right-8 bg-[#fffbf8] p-2.5 md:p-4 rounded-xl md:rounded-2xl shadow-lg border border-[#35251a]/5 items-center gap-2 md:gap-4 z-30"
             >
               <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                 <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114A5.514 5.514 0 0 1 8.5 13a5.514 5.514 0 0 1 5.491-5.514c1.47 0 2.808.57 3.81 1.493l3.076-3.076A9.927 9.927 0 0 0 13.991 3C8.473 3 4 7.473 4 13s4.473 10 9.991 10c5.772 0 10.244-4.664 10.244-10.244a9.124 9.124 0 0 0-.235-2.471H12.24Z" />
@@ -688,12 +695,12 @@ export default function Home() {
       <div className="h-4 bg-[#efeae2] border-b border-[#35251a]/5" />
 
       {/* About Section */}
-      <section className="py-24 overflow-hidden" id="about">
+      <section className="py-16 md:py-24 overflow-hidden" id="about">
         <div className="max-w-7xl mx-auto px-6 md:px-16">
-          <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-center">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-24 items-center">
             
             {/* Left: Interactive/Overlap Image Group */}
-            <div className="relative order-2 md:order-1">
+            <div className="relative order-2 md:order-1 pb-6 md:pb-0">
               <div className="aspect-[1.2/1] rounded-2xl overflow-hidden shadow-lg relative border border-[#d1c4ba]/20">
                 <Image 
                   alt="Aura & Essence Med Spa Luxury Interior" 
@@ -703,7 +710,7 @@ export default function Home() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 w-2/3 aspect-square bg-[#f3ede9] border border-[#d1c4ba]/30 rounded-2xl -z-10 shadow-sm" />
+              <div className="hidden md:block absolute -bottom-6 -right-6 w-2/3 aspect-square bg-[#f3ede9] border border-[#d1c4ba]/30 rounded-2xl -z-10 shadow-sm" />
             </div>
 
             {/* Right: Text with numbers list */}
@@ -739,7 +746,7 @@ export default function Home() {
       </section>
 
       {/* Treatments Cards Grid */}
-      <section className="py-24 bg-white border-y border-[#d1c4ba]/30" id="treatments">
+      <section className="py-16 md:py-24 bg-white border-y border-[#d1c4ba]/30" id="treatments">
         <div className="max-w-7xl mx-auto px-6 md:px-16">
           <div className="text-center max-w-xl mx-auto mb-16">
             <span className="font-sans text-xs tracking-[0.25em] text-[#775a19] uppercase font-bold mb-3 block">Curated Services</span>
@@ -749,7 +756,7 @@ export default function Home() {
             <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 mt-3">Click on any card to view detailed clinical breakdowns, recoveries, benefits, and FAQ answers.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             {TREATMENTS.map((treatment, i) => {
               const IconComp = treatment.icon;
               return (
@@ -760,7 +767,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: i * 0.15 }}
                   onClick={() => setSelectedTreatment(treatment)}
-                  className="group bg-[#fff8f4] p-8 rounded-xl border border-[#d1c4ba]/30 hover-lift flex flex-col justify-between cursor-pointer"
+                  className="group bg-[#fff8f4] p-6 md:p-8 rounded-xl border border-[#d1c4ba]/30 hover-lift flex flex-col justify-between cursor-pointer"
                   id={`treatment-card-${treatment.id}`}
                 >
                   <div>
@@ -787,7 +794,7 @@ export default function Home() {
       </section>
 
       {/* Process Section */}
-      <section className="py-24" id="process">
+      <section className="py-16 md:py-24" id="process">
         <div className="max-w-7xl mx-auto px-6 md:px-16">
           <div className="text-center max-w-xl mx-auto mb-20">
             <span className="font-sans text-xs tracking-[0.25em] text-[#775a19] uppercase font-bold mb-3 block">The Experience</span>
@@ -800,14 +807,14 @@ export default function Home() {
             {/* Horizontal Line connector */}
             <div className="hidden md:block absolute top-8 left-12 right-12 h-[1px] bg-[#d1c4ba]/40 -z-10" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
               
               <div className="flex flex-col items-center group">
                 <div className="w-16 h-16 bg-white border border-[#d1c4ba] rounded-full flex items-center justify-center mb-6 group-hover:border-[#6c5842] transition-colors duration-300 shadow-sm shrink-0 font-display text-lg text-[#6c5842] font-light">
                   01
                 </div>
                 <h4 className="font-display text-lg text-[#6c5842] mb-2 font-medium">Consultation</h4>
-                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed max-w-[200px]">
+                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed">
                   Deep clinical analysis of your biological skin goals and full medical history.
                 </p>
               </div>
@@ -817,7 +824,7 @@ export default function Home() {
                   02
                 </div>
                 <h4 className="font-display text-lg text-[#6c5842] mb-2 font-medium">Analysis</h4>
-                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed max-w-[200px]">
+                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed">
                   Advanced skin diagnostics to map your facial muscle tone and structural architecture.
                 </p>
               </div>
@@ -827,7 +834,7 @@ export default function Home() {
                   03
                 </div>
                 <h4 className="font-display text-lg text-[#6c5842] mb-2 font-medium">Plan</h4>
-                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed max-w-[200px]">
+                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed">
                   A customized, multi-step treatment roadmap precisely budgeted and scheduled.
                 </p>
               </div>
@@ -837,7 +844,7 @@ export default function Home() {
                   <Sparkles className="w-6 h-6 text-[#fed488]" />
                 </div>
                 <h4 className="font-display text-lg text-[#6c5842] mb-2 font-medium">Glow</h4>
-                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed max-w-[200px]">
+                <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 leading-relaxed">
                   Experience transformation in luxury, cocooned with specialized serene aftercare.
                 </p>
               </div>
@@ -847,138 +854,173 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Before & After Comparison Section */}
-      <section className="py-24 champagne-gradient relative border-y border-[#d1c4ba]/30" id="before-after">
-        <div className="max-w-7xl mx-auto px-6 md:px-16">
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
-            
-            {/* Left Column: Editorial Description */}
-            <div className="lg:w-1/3 flex flex-col items-start text-left">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-[1px] w-8 bg-[#775a19]/40" />
-                <span className="font-sans text-xs tracking-[0.25em] text-[#775a19] uppercase font-bold">Aura Results</span>
-              </div>
-              
-              <h2 className="font-display text-4xl sm:text-5xl text-[#6c5842] mb-6 leading-tight font-light italic md:not-italic">
-                The Art of <br/>Transformation
+      {/* Before & After Section — Side-by-Side Static */}
+      <section className="py-14 md:py-20 bg-[#f7f2ee] relative" id="before-after">
+        <div className="max-w-7xl mx-auto px-5 md:px-16">
+
+          {/* Main layout grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-x-16 lg:gap-y-10 items-start">
+
+            {/* ① Text — mobile: 1st | desktop: col 1-5 row 1 */}
+            <div className="w-full lg:col-start-1 lg:col-span-5 lg:row-start-1 flex flex-col items-start text-left">
+              {/* Tag */}
+              <span className="font-sans text-[10px] tracking-[0.25em] text-[#775a19] uppercase font-bold mb-3">Real Results. Real Confidence.</span>
+              <div className="h-[1.5px] w-10 bg-[#bda17a] mb-6" />
+
+              <h2 className="font-display text-3xl sm:text-4xl md:text-[3.5rem] text-[#35251a] mb-4 md:mb-5 leading-[1.1] font-light">
+                The Art of <br/><span className="italic">Transformation</span>
               </h2>
-              
-              <div className="lg:pl-4 border-l lg:border-[#6c5842]/20">
-                <p className="font-sans text-sm md:text-base text-[#4e453d] leading-relaxed mb-8 max-w-sm">
-                  Our Aura Approach prioritizes facial harmony over radical change. We utilize advanced clinical protocols to subtly restore youthful contours while preserving the unique character that makes you, you.
-                </p>
-                
-                <button 
-                  onClick={() => handleBookingShortcut('General Consultation')}
-                  className="font-sans text-xs tracking-widest text-[#6c5842] border-b border-[#6c5842]/30 pb-1 font-bold uppercase hover:border-[#6c5842] transition-colors"
-                >
-                  Explore the methodology →
-                </button>
-              </div>
+
+              <p className="font-sans text-sm text-[#5c4e43] leading-relaxed mb-6 max-w-sm">
+                Subtle enhancements. Stunning results.<br/>See the difference expert care can make.
+              </p>
+
+              <button
+                onClick={() => handleBookingShortcut('General Consultation')}
+                className="flex items-center gap-2 px-6 py-3 border border-[#35251a]/40 text-[#35251a] rounded-full font-sans text-xs tracking-widest uppercase font-semibold hover:bg-[#35251a] hover:text-white transition-all duration-300 mb-2"
+                id="before-after-cta-btn"
+              >
+                Book Your Consultation <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
 
-            {/* Right Column: Redesigned Interactive Slider */}
-            <div className="lg:w-2/3 w-full">
-              <div className="relative p-1 border border-[#d1c4ba]/20 bg-[#fff8f4]/60 rounded-xl overflow-hidden shadow-sm">
-                
-                {/* Comparison Slider Container */}
-                <div 
-                  ref={sliderContainerRef}
-                  onMouseDown={handleSliderStart}
-                  onTouchStart={handleSliderStart}
-                  className="relative aspect-[4/5] md:aspect-[16/10] bg-[#dfd9d5] overflow-hidden select-none cursor-ew-resize rounded-lg"
-                  id="comparison-slider"
-                >
-                  {/* Before Base Layer (Bottom) */}
-                  <div className="absolute inset-0 w-full h-full overflow-hidden">
-                    <div className="absolute inset-y-0 left-0 w-full h-full">
-                      <Image 
-                        alt="Before" 
-                        className="pointer-events-none"
-                        src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=3840&q=95"
-                        fill
-                        sizes="100vw"
-                        style={{ 
-                          objectFit: 'cover',
-                          filter: 'saturate(0.8) contrast(0.92) brightness(0.9)',
-                        }}
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                  </div>
-
-                  {/* After Layer (Top Overlay) */}
-                  <div 
-                    className="absolute inset-y-0 left-0 overflow-hidden"
-                    style={{ width: `${sliderPercentage}%` }}
-                    id="after-layer"
-                  >
-                    <div className="absolute inset-y-0 left-0 h-full" style={{ width: `${10000 / sliderPercentage}%` }}>
-                      <div className="absolute inset-y-0 left-0 w-full h-full">
-                        <Image 
-                          alt="After" 
-                          className="pointer-events-none"
-                          src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=3840&q=95"
-                          fill
-                          sizes="100vw"
-                          style={{ 
-                            objectFit: 'cover',
-                            filter: 'saturate(1.05) contrast(1.02) brightness(1.05)',
-                          }}
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Minimal Vertical Drag Handle Line & Grip Badge */}
-                  <div 
-                    className="absolute inset-y-0 z-20 w-[1px] bg-white/70 shadow-md cursor-ew-resize"
-                    style={{ left: `${sliderPercentage}%` }}
-                    id="slider-handle"
-                  >
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#6c5842] flex items-center justify-center shadow-xl border border-[#d1c4ba]/50 text-[10px] tracking-widest uppercase font-bold shrink-0">
-                      AE
-                    </div>
-                  </div>
-
-                  {/* Elegantly positioned labels */}
-                  <div 
-                    className="absolute bottom-6 right-6 z-10 transition-opacity duration-300 pointer-events-none"
-                    style={{ opacity: (100 - sliderPercentage) < 15 ? 0 : 1 }}
-                    id="label-before"
-                  >
-                    <span className="px-5 py-2 bg-black/30 backdrop-blur-md text-white font-sans text-[10px] uppercase tracking-widest rounded-md border border-white/10 shadow-sm">
-                      Baseline
-                    </span>
-                  </div>
-
-                  <div 
-                    className="absolute bottom-6 left-6 z-10 transition-opacity duration-300 pointer-events-none"
-                    style={{ opacity: sliderPercentage < 15 ? 0 : 1 }}
-                    id="label-after"
-                  >
-                    <span className="px-5 py-2 bg-[#6c5842]/70 backdrop-blur-md text-white font-sans text-[10px] uppercase tracking-widest rounded-md border border-[#fadec1]/20 shadow-md">
-                      Refined
-                    </span>
-                  </div>
-
+            {/* ② Slider — mobile: 2nd | desktop: col 6-12 spanning rows 1-2 */}
+            <div className="w-full lg:col-start-6 lg:col-span-7 lg:row-start-1 lg:row-span-2">
+              <div
+                ref={sliderContainerRef}
+                onMouseDown={handleSliderStart}
+                onTouchStart={handleSliderStart}
+                className="relative aspect-[4/5] sm:aspect-[4/3] lg:aspect-[3/4] bg-[#e8e0d6] rounded-2xl overflow-hidden shadow-xl select-none cursor-ew-resize"
+                id="comparison-slider"
+              >
+                {/* BEFORE — full background */}
+                <div className="absolute inset-0">
+                  <Image
+                    alt="Before treatment"
+                    src={currentResult.beforeSrc}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 700px"
+                    className="object-cover object-center pointer-events-none"
+                  />
+                  {/* BEFORE label */}
+                  <span className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md font-sans text-[9px] tracking-widest uppercase font-bold text-[#35251a] shadow-sm">
+                    Before
+                  </span>
                 </div>
 
-                {/* Info Tip below slider */}
-                <p className="text-center font-sans text-[11px] text-[#4e453d]/70 py-2.5">
-                  Drag the center AE slider handle left or right to inspect baseline vs. refined contours.
-                </p>
+                {/* AFTER — clipped reveal layer */}
+                <div
+                  className="absolute inset-y-0 left-0 overflow-hidden"
+                  style={{ width: `${sliderPercentage}%` }}
+                >
+                  <div
+                    className="absolute inset-y-0 left-0 h-full"
+                    style={{ width: `${10000 / Math.max(sliderPercentage, 1)}%` }}
+                  >
+                    <Image
+                      alt="After treatment"
+                      src={currentResult.afterSrc}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 700px"
+                      className="object-cover object-center pointer-events-none"
+                    />
+                  </div>
+                  {/* AFTER label */}
+                  <span className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md font-sans text-[9px] tracking-widest uppercase font-bold text-[#35251a] shadow-sm">
+                    After
+                  </span>
+                </div>
 
+                {/* Vertical divider line */}
+                <div
+                  className="absolute inset-y-0 z-20 w-[2px] bg-white/80 shadow-md"
+                  style={{ left: `${sliderPercentage}%` }}
+                />
+
+                {/* Drag handle — white circle with chevrons */}
+                <div
+                  className="absolute top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border border-[#d1c4ba]/40 cursor-ew-resize"
+                  style={{ left: `${sliderPercentage}%` }}
+                >
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#6c5842]" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </div>
+              </div>
+
+              <p className="text-center font-sans text-[11px] text-[#5c4e43]/60 mt-3 tracking-wide">
+                Drag the handle to compare before &amp; after results
+              </p>
+            </div>
+
+            {/* ③ Filters + Card — mobile: 3rd | desktop: col 1-5 row 2 */}
+            <div className="w-full lg:col-start-1 lg:col-span-5 lg:row-start-2 flex flex-col items-start text-left">
+              {/* Filter Pills — horizontal scroll on mobile */}
+              <div className="mb-6 w-full">
+                <span className="font-sans text-[9px] tracking-[0.25em] text-[#7f6f60] uppercase font-bold block mb-3">Explore Results</span>
+                <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth no-scrollbar" id="result-filter-pills">
+                  {['All', 'Skin', 'Lips', 'Jawline', 'Acne', 'Laser', 'Body'].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveResultFilter(filter)}
+                      className={`px-4 py-1.5 rounded-full font-sans text-xs font-medium border transition-all shrink-0 ${
+                        activeResultFilter === filter
+                          ? 'bg-[#35251a] text-white border-[#35251a]'
+                          : 'bg-white text-[#4e453d] border-[#d1c4ba]/60 hover:border-[#6c5842]'
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Treatment info card */}
+              <div className="bg-white rounded-xl p-5 border border-[#d1c4ba]/30 shadow-sm flex gap-4 items-start w-full sm:max-w-md">
+                <div className="w-10 h-10 bg-[#f3ede9] rounded-full flex items-center justify-center shrink-0 border border-[#d1c4ba]/30">
+                  <Sparkles className="w-5 h-5 text-[#bda17a]" />
+                </div>
+                <div>
+                  <p className="font-sans text-xs text-[#4e453d] leading-relaxed">
+                    Every treatment plan is personalized for natural, long-lasting results.
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-3">
+                    <Shield className="w-3 h-3 text-[#bda17a]" />
+                    <span className="font-sans text-[9px] tracking-widest text-[#775a19] uppercase font-bold">Safe</span>
+                    <span className="text-[#d1c4ba] mx-1">•</span>
+                    <span className="font-sans text-[9px] tracking-widest text-[#775a19] uppercase font-bold">Effective</span>
+                    <span className="text-[#d1c4ba] mx-1">•</span>
+                    <span className="font-sans text-[9px] tracking-widest text-[#775a19] uppercase font-bold">Natural</span>
+                  </div>
+                </div>
               </div>
             </div>
 
           </div>
+
+          {/* Bottom 5-column Feature Strip */}
+          <div className="mt-10 md:mt-16 pt-8 md:pt-10 border-t border-[#d1c4ba]/40 grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
+            {[
+              { icon: Award, title: 'Expert Care', desc: 'Board-certified specialists with years of experience.' },
+              { icon: Sparkles, title: 'Advanced Technology', desc: 'State-of-the-art equipment for optimal results.' },
+              { icon: Heart, title: 'Personalized Treatments', desc: 'Tailored plans designed for your unique goals.' },
+              { icon: Shield, title: 'Safety First', desc: 'Highest standards of safety and proven protocols.' },
+              { icon: Star, title: 'Natural Results', desc: 'Enhancing your beauty while keeping it natural.' },
+            ].map(({ icon: Icon, title, desc }, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <Icon className="w-5 h-5 text-[#bda17a]" />
+                <span className="font-sans text-[9px] tracking-widest text-[#35251a] font-bold uppercase">{title}</span>
+                <p className="font-sans text-[11px] text-[#5c4e43]/80 leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+
         </div>
       </section>
 
       {/* Pricing Section - Curated Tiers */}
-      <section className="py-24 bg-[#f9f2ef]" id="pricing">
+      <section className="py-16 md:py-24 bg-[#f9f2ef]" id="pricing">
         <div className="max-w-7xl mx-auto px-6 md:px-16">
           <div className="text-center max-w-xl mx-auto mb-16">
             <span className="font-sans text-xs tracking-[0.25em] text-[#775a19] uppercase font-bold mb-3 block">Membership Plans</span>
@@ -988,16 +1030,16 @@ export default function Home() {
             <p className="font-sans text-xs md:text-sm text-[#4e453d]/80 mt-2">Invest in steady, compound skin refinement with flexible monthly tiers.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 items-stretch pt-6">
             {MEMBERSHIPS.map((plan) => (
               <motion.div 
                 key={plan.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className={`p-10 rounded-2xl border flex flex-col justify-between relative transition-all duration-300 ${
+                className={`p-7 md:p-10 rounded-2xl border flex flex-col justify-between relative transition-all duration-300 ${
                   plan.accent 
-                    ? 'bg-[#6c5842] text-white border-[#6c5842] shadow-2xl md:-translate-y-4' 
+                    ? 'bg-[#6c5842] text-white border-[#6c5842] shadow-2xl sm:mt-6 md:mt-0 md:-translate-y-4' 
                     : 'bg-white text-[#1d1b19] border-[#d1c4ba]/30 shadow-md'
                 }`}
                 id={`membership-tier-${plan.id}`}
@@ -1056,16 +1098,16 @@ export default function Home() {
       </section>
 
       {/* Booking Form and Studio Details */}
-      <section className="py-24 relative overflow-hidden" id="contact">
+      <section className="py-16 md:py-24 relative overflow-hidden" id="contact">
         
         {/* Background skew card */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-[#f9f2ef] -skew-x-12 translate-x-1/2 -z-10 hidden md:block" />
 
-        <div className="max-w-7xl mx-auto px-6 md:px-16 grid md:grid-cols-2 gap-16 md:gap-24 items-start">
+        <div className="max-w-7xl mx-auto px-5 md:px-16 grid md:grid-cols-2 gap-10 md:gap-24 items-start">
           
           {/* Left Column: Contact details */}
           <div className="flex flex-col text-left">
-            <h2 className="font-display text-4xl text-[#6c5842] mb-6 font-light leading-tight">
+            <h2 className="font-display text-3xl md:text-4xl text-[#6c5842] mb-5 font-light leading-tight">
               Begin Your <br/>Transformation
             </h2>
             <p className="font-sans text-sm md:text-base text-[#4e453d] mb-12 max-w-sm leading-relaxed">
@@ -1114,7 +1156,7 @@ export default function Home() {
 
           {/* Right Column: Complete Interactive Booking Scheduler */}
           <div className="w-full">
-            <div className="bg-white p-8 md:p-10 rounded-2xl border border-[#d1c4ba]/40 shadow-xl relative" id="booking-container-card">
+            <div className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl border border-[#d1c4ba]/40 shadow-xl relative" id="booking-container-card">
               
               <div className="mb-8 border-b border-[#d1c4ba]/20 pb-4">
                 <p className="font-sans text-[10px] tracking-widest text-[#775a19] uppercase font-bold mb-1">Instant Consult Scheduler</p>
@@ -1128,13 +1170,13 @@ export default function Home() {
                   <label className="font-sans text-[10px] tracking-wider text-[#6c5842] uppercase font-bold block">
                     1. Select Date
                   </label>
-                  <div className="grid grid-cols-5 gap-2" id="date-picker-grid">
+                  <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth" id="date-picker-grid">
                     {simulatedDates.map((date, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => setSelectedDateIndex(idx)}
-                        className={`py-2 rounded-xl border flex flex-col items-center justify-center transition-all ${
+                        className={`py-2 px-3 rounded-xl border flex flex-col items-center justify-center shrink-0 min-w-[64px] transition-all ${
                           selectedDateIndex === idx
                             ? 'bg-[#6c5842] text-white border-[#6c5842] shadow-sm'
                             : 'bg-[#fff8f4] hover:bg-[#f3ede9] border-[#d1c4ba]/40 text-[#4e453d]'
@@ -1154,7 +1196,7 @@ export default function Home() {
                   <label className="font-sans text-[10px] tracking-wider text-[#6c5842] uppercase font-bold block">
                     2. Select Preferred Time
                   </label>
-                  <div className="flex gap-2 overflow-x-auto pb-1.5 custom-scrollbar scroll-smooth" id="time-picker-row">
+                  <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth" id="time-picker-row">
                     {timeSlots.map((time, idx) => (
                       <button
                         key={idx}
@@ -1254,8 +1296,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#f9f2ef] border-t border-[#d1c4ba]/30 w-full pt-16 pb-12">
-        <div className="max-w-7xl mx-auto px-6 md:px-16 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <footer className="bg-[#f9f2ef] border-t border-[#d1c4ba]/30 w-full pt-12 md:pt-16 pb-10 md:pb-12">
+        <div className="max-w-7xl mx-auto px-5 md:px-16 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
           
           {/* Col 1: Brand details */}
           <div className="flex flex-col items-start text-left gap-4">

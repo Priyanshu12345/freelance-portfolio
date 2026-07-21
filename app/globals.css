@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* Hide scrollbar globally */
+html,
+body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 @theme {
   --font-display: var(--font-display), serif;
   --font-sans: var(--font-sans), sans-serif;
@@ -37,4 +49,15 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #d1c4ba;
   border-radius: 9999px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
