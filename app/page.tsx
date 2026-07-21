@@ -175,9 +175,26 @@ export default function Home() {
   // Local state for Client Reservations Dashboard
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [simulatedDates, setSimulatedDates] = useState<Array<{dayName: string, dayNum: number, month: string, fullString: string}>>([]);
 
   useEffect(() => {
     setMounted(true);
+    // Generate dates on client to prevent SSR hydration mismatch on Vercel
+    const dates = [];
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    for (let i = 1; i <= 5; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      dates.push({
+        dayName: weekdays[d.getDay()],
+        dayNum: d.getDate(),
+        month: months[d.getMonth()],
+        fullString: `${weekdays[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`
+      });
+    }
+    setSimulatedDates(dates);
+
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('aura_essence_appointments');
       if (saved) {
@@ -264,26 +281,13 @@ export default function Home() {
     }, 4000);
   };
 
-  // Pre-fill generated dates for scheduling
-  // Generates next 5 days excluding Sunday if needed, starting tomorrow
-  const getSimulatedDates = () => {
-    const dates = [];
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    for (let i = 1; i <= 5; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      dates.push({
-        dayName: weekdays[d.getDay()],
-        dayNum: d.getDate(),
-        month: months[d.getMonth()],
-        fullString: `${weekdays[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`
-      });
-    }
-    return dates;
-  };
-  const simulatedDates = getSimulatedDates();
+  const displayDates = simulatedDates.length > 0 ? simulatedDates : [
+    { dayName: 'Mon', dayNum: 1, month: 'Next', fullString: 'Tomorrow' },
+    { dayName: 'Tue', dayNum: 2, month: 'Next', fullString: 'Day 2' },
+    { dayName: 'Wed', dayNum: 3, month: 'Next', fullString: 'Day 3' },
+    { dayName: 'Thu', dayNum: 4, month: 'Next', fullString: 'Day 4' },
+    { dayName: 'Fri', dayNum: 5, month: 'Next', fullString: 'Day 5' }
+  ];
 
   const timeSlots = ['09:30 AM', '11:00 AM', '01:30 PM', '03:00 PM', '04:30 PM'];
 
@@ -295,14 +299,18 @@ export default function Home() {
       return;
     }
 
+    const selectedDateString = (simulatedDates.length > 0 && simulatedDates[selectedDateIndex])
+      ? simulatedDates[selectedDateIndex].fullString
+      : 'Tomorrow';
+
     const newAppointment: Appointment = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: formName,
-      email: formEmail,
+      id: `AE-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: formName.trim(),
+      email: formEmail.trim(),
       treatment: formTreatment,
-      date: simulatedDates[selectedDateIndex].fullString,
+      date: selectedDateString,
       time: selectedTimeSlot,
-      notes: formMessage,
+      notes: formMessage.trim(),
       status: 'Pending Review',
       createdAt: new Date().toLocaleDateString()
     };
@@ -412,10 +420,17 @@ export default function Home() {
               Pricing
             </a>
             <button 
+              type="button"
               onClick={() => setIsDashboardOpen(true)}
-              className="font-sans text-xs tracking-widest text-[#4e453d]/80 hover:text-[#6c5842] uppercase font-semibold transition-colors duration-300"
+              className="font-sans text-xs tracking-widest text-[#4e453d]/80 hover:text-[#6c5842] uppercase font-semibold transition-colors duration-300 flex items-center gap-1.5"
+              id="open-console-header-btn"
             >
-              Console
+              <span>Console</span>
+              {mounted && appointments.length > 0 && (
+                <span className="bg-[#775a19] text-white rounded-full text-[9px] w-4 h-4 flex items-center justify-center font-bold">
+                  {appointments.length}
+                </span>
+              )}
             </button>
             <a 
               href="#contact" 
@@ -1163,7 +1178,7 @@ export default function Home() {
                     1. Select Date
                   </label>
                   <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth" id="date-picker-grid">
-                    {simulatedDates.map((date, idx) => (
+                    {displayDates.map((date, idx) => (
                       <button
                         key={idx}
                         type="button"
