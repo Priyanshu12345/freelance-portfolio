@@ -384,16 +384,9 @@ export default function Home() {
         <div className="flex justify-between items-center w-full px-6 md:px-16 max-w-7xl mx-auto">
           {/* Logo & Brand Name */}
           <a href="#" className="flex items-center gap-3.5 group">
-            <div className="w-10 h-10 relative flex items-center justify-center shrink-0">
-              <Image 
-                alt="Aura & Essence Logo" 
-                className="object-contain" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAr9zNLcFRcy2HEJHfYLPhTNB0tLT6RqcSYPPsMaycLUgek40B2eaTTeLU5cZdb2xjPCTYX1kzuVUd52_QlpmwXRi6i7X8nTn6M_bUPxuoSLdSRikgEV_MrIyOkUVOUbBiCI5xC_sFMZp0RPLPGlI53vGipKkrS9BhkgSNKzmbf2fJ1bNBAa79OTi1pLyDvCfySt7d0L20xiS-AKICZaM7IFPGhOaZRf2dY2vHZS1QFjmmSTN-TG-kueCXEXBj1CO7o0ArO_bG2nbY"
-                width={40}
-                height={40}
-                referrerPolicy="no-referrer"
-              />
-            </div>
+              <div className="w-9 h-9 rounded-full bg-[#775a19]/10 flex items-center justify-center border border-[#775a19]/20 shrink-0">
+                <Sparkles className="w-5 h-5 text-[#775a19]" />
+              </div>
             <div className="flex flex-col">
               <span className="font-display text-base md:text-lg tracking-[0.2em] text-[#35251a] uppercase font-medium leading-none">
                 AURA & ESSENCE
@@ -705,9 +698,8 @@ export default function Home() {
                 <Image 
                   alt="Aura & Essence Med Spa Luxury Interior" 
                   className="object-cover hover:scale-105 transition-transform duration-700" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFprcX_-bpwQ7xrUkh4T_v6l-LDrIC_3CizOXEI3lOZhioA2h5E38pm6rYUdSD0JPKunBzO_qZbrkYK3F0xlCPBt_y-SuhIUetB4upDK-d8LouL70yRnYFPFKBDdCqogQL_I6S7BJLRpdCAsl6VPqx7JpCW9qO4aiLKm1ee3JqGit-y3ngzCa8tYiSviZJECFOMcPRd7kwNbFKUlolvxgWGRQUjMSQA2QCmLIyCaO8or2akFFmjRo7YlG3dkEINLVsaJopPafQmeyT"
+                  src="/spa-room.jpg"
                   fill
-                  referrerPolicy="no-referrer"
                 />
               </div>
               <div className="hidden md:block absolute -bottom-6 -right-6 w-2/3 aspect-square bg-[#f3ede9] border border-[#d1c4ba]/30 rounded-2xl -z-10 shadow-sm" />
@@ -1302,14 +1294,8 @@ export default function Home() {
           {/* Col 1: Brand details */}
           <div className="flex flex-col items-start text-left gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 relative">
-                <Image 
-                  alt="Aura & Essence Footer Logo" 
-                  className="object-contain" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAr9zNLcFRcy2HEJHfYLPhTNB0tLT6RqcSYPPsMaycLUgek40B2eaTTeLU5cZdb2xjPCTYX1kzuVUd52_QlpmwXRi6i7X8nTn6M_bUPxuoSLdSRikgEV_MrIyOkUVOUbBiCI5xC_sFMZp0RPLPGlI53vGipKkrS9BhkgSNKzmbf2fJ1bNBAa79OTi1pLyDvCfySt7d0L20xiS-AKICZaM7IFPGhOaZRf2dY2vHZS1QFjmmSTN-TG-kueCXEXBj1CO7o0ArO_bG2nbY"
-                  fill
-                  referrerPolicy="no-referrer"
-                />
+              <div className="w-8 h-8 rounded-full bg-[#775a19]/10 flex items-center justify-center border border-[#775a19]/20 shrink-0">
+                <Sparkles className="w-4 h-4 text-[#775a19]" />
               </div>
               <span className="font-display tracking-[0.15em] text-[#6c5842] uppercase text-sm font-semibold">AURA & ESSENCE</span>
             </div>
